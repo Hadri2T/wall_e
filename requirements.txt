@@ -40,3 +40,6 @@ uvicorn
 # tests
 httpx<0.28
 pytest-asyncio
+
+#OpenCV - For images
+opencv-python
