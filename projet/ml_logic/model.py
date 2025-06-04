@@ -1,15 +1,9 @@
-from PIL import Image
-import numpy as np
-import os
-from tensorflow.keras import Sequential, layers, Input
-from tensorflow.keras.callbacks import EarlyStopping
-
 
 
 
 # A priori cette fonction va bouger parce que Hadrien s'occupe déjà d'une bonne partie
 
-def load_and_preprocess_images(df, image_dir, img_size=(64, 64)):
+def load_and_preprocess_images(df, image_dir, img_size=(128, 128)):
     """
     Charge et prétraite les images et les labels à partir d'un DataFrame.
 
@@ -28,7 +22,7 @@ def load_and_preprocess_images(df, image_dir, img_size=(64, 64)):
         img = Image.open(filepath).convert('RGB').resize(img_size)
         img_array = np.array(img, dtype=np.float32) / 255.  # Normalisation [0,1]
         X.append(img_array)
-        y.append(row['target'])
+        y.append(row['encoded_target'])
     X = np.array(X)
     y = np.array(y, dtype=np.float32)
     print(X.shape)
@@ -38,56 +32,41 @@ def load_and_preprocess_images(df, image_dir, img_size=(64, 64)):
 
 # J'ai besoin que ce soit resize + RGB puis converti en nparray + normalisation
 
-
-
-
-
-def model1(X, y, input_shape=(64, 64, 3), batch_size=32, epochs=50, validation_split=0.2, patience=5):
+def model(X, y, early_stopping, input_shape=(128, 128, 3)):
     """
-    Construit et entraîne un modèle CNN pour reconnaître si un déchet est plastique ou non sur un déchet
+    Définit et compile un modèle CNN simple pour la classification d'images.
 
     Args:
-        X (np.array): Images prétraitées.
-        y (np.array): Labels.
-        input_shape (tuple): Shape des images en entrée.
-        batch_size (int): Taille du batch pour l'entraînement.
-        epochs (int): Nombre d'époques.
-        validation_split (float): Proportion de validation.
-        patience (int): Patience pour l'early stopping.
+        input_shape (tuple): La forme des images en entrée.
 
     Returns:
-        model: Modèle entraîné.
-        history: Historique d'entraînement.
+        model (tf.keras.Model): Le modèle compilé.
     """
+    from tensorflow.keras import Sequential, layers, Input
+
     model = Sequential([
-        Input(shape=input_shape),
-
-        layers.Conv2D(32, (3, 3), activation='relu', padding='same'),
-        layers.MaxPooling2D((2, 2)),
-
-        layers.Conv2D(64, (3, 3), activation='relu', padding='same'),
-        layers.MaxPooling2D((2, 2)),
-
-        layers.Conv2D(128, (3, 3), activation='relu', padding='same'),
-        layers.MaxPooling2D((2, 2)),
-
+        Input(shape=(128, 128, 3)),
+        layers.Rescaling(1./255),
+        layers.Conv2D(32, 3, activation='relu'),
+        layers.MaxPooling2D(),
+        layers.Conv2D(128, 3, activation='relu'),
+        layers.MaxPooling2D(),
         layers.Flatten(),
-        layers.Dense(64, activation='relu'),
-        layers.Dropout(0.3),
-        layers.Dense(1, activation='sigmoid')  # binaire
+        layers.Dense(128, activation='relu'),
+        layers.Dense(3, activation='softmax')  # ← 3 classes = plastique, métal, verre
     ])
 
     model.compile(
-        optimizer='adam',
-        loss='binary_crossentropy',
-        metrics=['accuracy']
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
     )
 
-    history = model.fit(
+    model.fit(
         X, y,
-        validation_split=validation_split,
-        batch_size=batch_size,
-        epochs=epochs,
-        callbacks=[EarlyStopping(patience=patience, restore_best_weights=True)]
+        validation_split=0.2,
+        batch_size=32,
+        epochs=50,
+        callbacks=[EarlyStopping(patience=5, restore_best_weights=True)]
     )
-    return model, history
+    return model
