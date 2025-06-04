@@ -27,3 +27,6 @@ mlruns
 
 # Challengify - test challengification files
 *_challengify*
+
+test_blobs/
+processed_data/
