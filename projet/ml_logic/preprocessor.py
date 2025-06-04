@@ -76,10 +76,6 @@ def resize_with_padding(image_path, target_size=(64, 64)):
     #On redimensionne la taille finale
     final_image = tf.image.resize(padded_image, target_size)
 
-    plt.imshow(final_image)
-    plt.axis('off')
-    plt.show()
-
     return final_image
 
 
@@ -128,6 +124,76 @@ def resize_bounding_boxes(df, target_size = (64,64)):
             'ymax': ymax_resized
         })
 
-        df_bounding_boxes = pd.DataFrame(new_bounding_boxes)
+    df_bounding_boxes = pd.DataFrame(new_bounding_boxes)
 
     return df_bounding_boxes
+
+
+def preprocess_and_save_dataset(
+    csv_path,
+    image_folder,
+    preprocessed_images_root,
+    target_size=(64, 64),
+    gcp=False
+):
+    ''' csv_path (str) : chemin vers le fichier d’annotations
+
+    image_folder (str) : dossier contenant les images originales
+
+    preprocessed_images (str) : racine du dossier de sortie
+
+    target_size (tuple) : dimension finale (par défaut (64, 64))
+
+    gcp (bool) : pour uploader vers GCS '''
+
+    df = pd.read_csv(csv_path)
+
+
+    # ten= df["filename"].unique()[:10]
+
+    # df_test = df[df["filename"].isin(ten)]
+
+    df_resized = resize_bounding_boxes(df, target_size)
+
+    size_file = str(target_size[0])
+    split_name = os.path.basename(image_folder.rstrip("/"))
+    output_dir = os.path.join(preprocessed_images_root, f"preprocessed_images_{size_file}_{split_name}")
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Boucler sur chaque image unique dans le CSV
+    for filename in df_resized['filename'].unique():
+        #Construction du chemin complet vers l'image
+        image_path = os.path.join(image_folder, filename)
+
+        try:
+            # Redimensionner et ajouter du padding à l'image
+            image_tensor = resize_with_padding(image_path, target_size)
+
+            # 1. Convertir le tf en np car PIL.Image ne prend que des arrays
+            # 2. Faire *255 car on avait mis au format 0 à 1 pour des questions de stabilités, mais que pour sortir des images il faut des couleurs
+            # 3. On remet en int car les floats ne sont pas acceptés par PIL
+            image_array = (image_tensor.numpy() * 255).astype(np.uint8)
+
+            # Définir le chemin de sortie
+            output_path = os.path.join(output_dir, filename)
+
+            if gcp:
+                # Je sais pas comment envoyer sur le cloud
+                print(f"Image prête pour upload : {filename}")
+            else:
+                # Sauvegarde locale
+                # Image.fromarray transforme l'array en image
+                #.save() permet de le save dans le format que je veux en suivant le chemin que je veux
+                Image.fromarray(image_array).save(output_path, format="JPEG")
+
+        except Exception as e:
+            print(f"Erreur avec {filename} : {e}")
+
+        # Sauvegarder le CSV des bboxes redimensionnées car elles ont changé de coordonnées
+    if gcp:
+        print("CSV prêt pour upload")
+    else:
+        csv_output_path = os.path.join(output_dir, f"resized_annotations_{size_file}_{split_name}.csv")
+        df_resized.to_csv(csv_output_path, index=False)
+
+    return None
