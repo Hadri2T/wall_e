@@ -3,7 +3,7 @@
 
 # A priori cette fonction va bouger parce que Hadrien s'occupe déjà d'une bonne partie
 
-def load_and_preprocess_images(df, image_dir, img_size=(128, 128)):
+def load_and_preprocess_images(df, image_dir, img_size=(128, 128)): 
     """
     Charge et prétraite les images et les labels à partir d'un DataFrame.
 
