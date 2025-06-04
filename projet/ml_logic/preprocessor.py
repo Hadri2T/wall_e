@@ -32,7 +32,7 @@ def undersample_class(df, target_class='Plastic', frac=0.2, class_col='class', r
         target_class (str): La classe à sous-échantillonner.
         frac (float): La fraction à conserver pour la classe cible.
         class_col (str): Le nom de la colonne des classes.
-        random_state (int): Graine pour la reproductibilité.
+        random_state (int): Graine pour la reproductibilité. Pour éviter d'avoir le même échantillon supprimé à chaque fois
 
     Returns:
         pd.DataFrame: Un DataFrame équilibré avec la classe cible sous-échantillonnée.
@@ -48,5 +48,3 @@ def undersample_class(df, target_class='Plastic', frac=0.2, class_col='class', r
     df_balanced = pd.concat([df_target_sampled, df_other]).sample(frac=1, random_state=random_state).reset_index(drop=True)
 
     return df_balanced
-
-
