@@ -29,4 +29,5 @@ mlruns
 *_challengify*
 
 test_blobs/
+tests_blobs/
 processed_data/
