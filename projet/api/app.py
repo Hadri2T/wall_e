@@ -17,7 +17,4 @@ if uploaded_file is not None:
     st.markdown("### Résultat de la prédiction :")
     st.success("✅ Classe détectée : plastique")
 
-    # Sauvegarder temporairement
-    temp_path = os.path.join("uploads", uploaded_file.name)
-    os.makedirs("uploads", exist_ok=True)
-    image.save(temp_path)
+
