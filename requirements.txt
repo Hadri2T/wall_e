@@ -17,6 +17,7 @@ python-dotenv
 # API
 fastapi==0.108.0
 uvicorn
+streamlit
 
 #For images
 opencv-python
