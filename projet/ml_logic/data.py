@@ -22,15 +22,16 @@ def download_from_gcp(prefix_preprocess, destination_folder):
     bucket = client.bucket(BUCKET_NAME)
     blobs = list(bucket.list_blobs(prefix=prefix_preprocess))
     nb_images = len(blobs)
-    print("Début du téléchargement de {nb_images} images...")
+    print(f"Début du téléchargement de {nb_images} images...")
 
     for i, blob in enumerate(blobs):
         # Crée un nom de fichier local basé sur l'index ou le nom du blob
-        local_filename = os.path.join(destination_folder, f"{blob.name}")
+        relative_path = os.path.relpath(blob.name, start=prefix_preprocess)
+        local_filename = os.path.join(destination_folder, relative_path)
+
+        os.makedirs(os.path.dirname(local_filename), exist_ok=True)
 
         # Télécharge le fichier
-        if not os.path.exists(os.path.dirname(local_filename)):
-            os.makedirs(os.path.dirname(local_filename), exist_ok=True)
         blob.download_to_filename(local_filename)
-        print(f"Téléchargé : image ({i + 1}/{nb_images})")
-        
+
+        print(f"✅ Téléchargé ({i + 1}/{nb_images}) : {relative_path}")
