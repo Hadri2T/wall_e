@@ -1,6 +1,7 @@
 raw_data/
 .env
 notebooks
+blobs/
 
 # OS generated files #
 ######################
