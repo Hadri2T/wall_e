@@ -5,7 +5,7 @@ import keras
 import pandas as pd
 import tensorflow as tf
 import numpy as np
-import cv2
+from PIL import Image
 
 #Filtrer les images selon le nombres d'objets
 
