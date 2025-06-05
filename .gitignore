@@ -1,6 +1,7 @@
 raw_data/
 .env
 notebooks
+blobs/
 
 # OS generated files #
 ######################
@@ -27,5 +28,11 @@ mlruns
 
 # Challengify - test challengification files
 *_challengify*
+
 *.pt
 runs/
+
+test_blobs/
+tests_blobs/
+processed_data/
+
