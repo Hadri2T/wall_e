@@ -2,7 +2,13 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import pandas as pd
-from tensorflow.keras.callbacks import EarlyStopping
+import tensorflow
+import keras
+import keras.callbacks
+from keras.callbacks import EarlyStopping
+from PIL import Image
+import numpy as np
+from keras import Sequential, layers, Input
 
 
 def undersample_class(df, target_class='Plastic', frac=0.2, class_col='class', random_state=42):
@@ -92,7 +98,7 @@ def model(X, y, early_stopping, input_shape=(128, 128, 3)):
     Returns:
         model (tf.keras.Model): Le modèle compilé.
     """
-    from tensorflow.keras import Sequential, layers, Input
+
 
     model = Sequential([
         Input(shape=(128, 128, 3)),
