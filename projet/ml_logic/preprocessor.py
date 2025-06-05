@@ -1,53 +1,3 @@
-<<<<<<< HEAD
-def undersample_class(df, target_class='Plastic', frac=0.2, class_col='class', random_state=42):
-    """
-    Sous-échantillonne une classe spécifique dans un DataFrame pour équilibrer les classes.
-
-    Args:
-        df (pd.DataFrame): Le DataFrame contenant les données.
-        target_class (str): La classe à sous-échantillonner.
-        frac (float): La fraction à conserver pour la classe cible.
-        class_col (str): Le nom de la colonne des classes.
-        random_state (int): Graine pour la reproductibilité.
-
-    Returns:
-        pd.DataFrame: Un DataFrame équilibré avec la classe cible sous-échantillonnée.
-    """
-    # Séparer les lignes correspondant à la classe cible et aux autres classes
-    df_target = df[df[class_col] == target_class]
-    df_other = df[df[class_col] != target_class]
-
-    # Sous-échantillonnage de la classe cible
-    df_target_sampled = df_target.sample(frac=frac, random_state=random_state)
-
-    # Concaténer les deux DataFrames et mélanger les lignes
-    df_balanced = pd.concat([df_target_sampled, df_other]).sample(frac=1, random_state=random_state).reset_index(drop=True)
-
-    return df_balanced
-
-def class_proportion(df, col='class'):
-    """
-    Calcule la proportion de chaque classe dans une colonne spécifiée d'un DataFrame.
-
-    Args:
-        df (pd.DataFrame): Le DataFrame contenant les données.
-        col (str, optional): Le nom de la colonne pour laquelle calculer la proportion des classes.
-            Par défaut 'class'.
-
-    Returns:
-        pd.Series: Une série contenant la proportion (en pourcentage) de chaque classe dans la colonne spécifiée.
-
-    Exemple:
-        >>> class_proportion(df, col='target')
-        0    60.0
-        1    40.0
-        Name: target, dtype: float64
-    """
-    prop = df[col].value_counts(normalize=True) * 100
-    return prop
-
-class_proportion(df)
-=======
 import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -85,25 +35,17 @@ def filter_images(csv_path, min_objects=1, max_objects=None):
 #Redimensionner les images avec du padding si nécessaire
 def resize_with_padding(image_path, target_size=(64, 64)):
 
-    #print(image_path)
-
     #On lis le contenu du path
     image_file = tf.io.read_file(image_path)
 
-    #print(image_file)
-
     #On transforme ce qu'on lit en image
     image = tf.image.decode_jpeg(image_file, channels=3)
-
-    #print(image)
 
     #Ca marche pas avec des floats au dessus de 1
     image = tf.image.convert_image_dtype(image, tf.float32)
 
     #tf.shape - Returns a tensor containing the shape of the input tensor.
     image_shape = tf.shape(image)
-
-    #print(image_shape)
 
     #Trouver hauteur et largeur de l'image
     height = image_shape[0]
@@ -127,7 +69,6 @@ def resize_with_padding(image_path, target_size=(64, 64)):
     final_image = tf.image.resize(padded_image, target_size)
 
     return final_image
-
 
 #Resize les bounding boxes comme j'ai resize les images
 def resize_bounding_boxes(df, target_size = (64,64)):
@@ -178,7 +119,6 @@ def resize_bounding_boxes(df, target_size = (64,64)):
 
     return df_bounding_boxes
 
-
 def preprocess_and_save_dataset(
     csv_path,
     image_folder,
@@ -198,10 +138,6 @@ def preprocess_and_save_dataset(
 
     df = pd.read_csv(csv_path)
 
-
-    # ten= df["filename"].unique()[:10]
-
-    # df_test = df[df["filename"].isin(ten)]
 
     df_resized = resize_bounding_boxes(df, target_size)
 
@@ -247,4 +183,3 @@ def preprocess_and_save_dataset(
         df_resized.to_csv(csv_output_path, index=False)
 
     return None
->>>>>>> 4ab36519bd2713f1f54d19188dce1db5e5b83b21
