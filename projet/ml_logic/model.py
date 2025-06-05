@@ -15,7 +15,7 @@ def load_and_preprocess_images(df, image_dir, img_size=(128, 128)):
     Returns:
         tuple: (X, y) où X est un np.array d'images et y un np.array de labels.
     """
-    X = [] 
+    X = []
     y = []
     for _, row in df.iterrows():
         filepath = os.path.join(image_dir, row['filename'])
@@ -34,7 +34,7 @@ def load_and_preprocess_images(df, image_dir, img_size=(128, 128)):
 
 def model(X, y, early_stopping, input_shape=(128, 128, 3)):
     """
-    Définit et compile un modèle CNN simple pour la classification d'images.
+    Modèle pour trouver classe quand il y a un seul déchet 
 
     Args:
         input_shape (tuple): La forme des images en entrée.

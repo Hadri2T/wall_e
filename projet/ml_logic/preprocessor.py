@@ -1,28 +1,3 @@
-
-def class_proportion(df, col='class'):
-    """
-    Calcule la proportion de chaque classe dans une colonne spécifiée d'un DataFrame.
-
-    Args:
-        df (pd.DataFrame): Le DataFrame contenant les données.
-        col (str, optional): Le nom de la colonne pour laquelle calculer la proportion des classes.
-            Par défaut 'class'.
-
-    Returns:
-        pd.Series: Une série contenant la proportion (en pourcentage) de chaque classe dans la colonne spécifiée.
-
-    Exemple:
-        >>> class_proportion(df, col='target')
-        0    60.0
-        1    40.0
-        Name: target, dtype: float64
-    """
-    prop = df[col].value_counts(normalize=True) * 100
-    return prop
-
-class_proportion(df)
-
-
 def undersample_class(df, target_class='Plastic', frac=0.2, class_col='class', random_state=42):
     """
     Sous-échantillonne une classe spécifique dans un DataFrame pour équilibrer les classes.
@@ -49,4 +24,25 @@ def undersample_class(df, target_class='Plastic', frac=0.2, class_col='class', r
 
     return df_balanced
 
+def class_proportion(df, col='class'):
+    """
+    Calcule la proportion de chaque classe dans une colonne spécifiée d'un DataFrame.
 
+    Args:
+        df (pd.DataFrame): Le DataFrame contenant les données.
+        col (str, optional): Le nom de la colonne pour laquelle calculer la proportion des classes.
+            Par défaut 'class'.
+
+    Returns:
+        pd.Series: Une série contenant la proportion (en pourcentage) de chaque classe dans la colonne spécifiée.
+
+    Exemple:
+        >>> class_proportion(df, col='target')
+        0    60.0
+        1    40.0
+        Name: target, dtype: float64
+    """
+    prop = df[col].value_counts(normalize=True) * 100
+    return prop
+
+class_proportion(df)
