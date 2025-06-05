@@ -14,4 +14,3 @@ def train_yolo(data_yaml_path, epochs=3):
 
 if __name__ == '__main__':
     train_yolo('/Users/comelubrano/code/Hadri2T/wall_e/raw_data/ocean-waste-1/data.yaml')
- 
