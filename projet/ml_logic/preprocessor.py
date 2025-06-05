@@ -35,25 +35,17 @@ def filter_images(csv_path, min_objects=1, max_objects=None):
 #Redimensionner les images avec du padding si nécessaire
 def resize_with_padding(image_path, target_size=(64, 64)):
 
-    #print(image_path)
-
     #On lis le contenu du path
     image_file = tf.io.read_file(image_path)
 
-    #print(image_file)
-
     #On transforme ce qu'on lit en image
     image = tf.image.decode_jpeg(image_file, channels=3)
-
-    #print(image)
 
     #Ca marche pas avec des floats au dessus de 1
     image = tf.image.convert_image_dtype(image, tf.float32)
 
     #tf.shape - Returns a tensor containing the shape of the input tensor.
     image_shape = tf.shape(image)
-
-    #print(image_shape)
 
     #Trouver hauteur et largeur de l'image
     height = image_shape[0]
@@ -77,7 +69,6 @@ def resize_with_padding(image_path, target_size=(64, 64)):
     final_image = tf.image.resize(padded_image, target_size)
 
     return final_image
-
 
 #Resize les bounding boxes comme j'ai resize les images
 def resize_bounding_boxes(df, target_size = (64,64)):
@@ -128,7 +119,6 @@ def resize_bounding_boxes(df, target_size = (64,64)):
 
     return df_bounding_boxes
 
-
 def preprocess_and_save_dataset(
     csv_path,
     image_folder,
@@ -148,10 +138,6 @@ def preprocess_and_save_dataset(
 
     df = pd.read_csv(csv_path)
 
-
-    # ten= df["filename"].unique()[:10]
-
-    # df_test = df[df["filename"].isin(ten)]
 
     df_resized = resize_bounding_boxes(df, target_size)
 
