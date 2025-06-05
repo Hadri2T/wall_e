@@ -1,6 +1,7 @@
 raw_data/
 .env
 notebooks
+blobs/
 
 # OS generated files #
 ######################
@@ -9,7 +10,7 @@ __MACOSX
 # Jupiter Notebook #
 .pytest_cache
 __pycache__
-*checkpoint.ipynb
+*.ipynb
 *.ipynb_checkpoints
 
 # inteliJ #
@@ -27,4 +28,11 @@ mlruns
 
 # Challengify - test challengification files
 *_challengify*
- 
+
+
+test_blobs/
+tests_blobs/
+processed_data/
+saved_models/
+assets/
+variables/
