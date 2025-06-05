@@ -34,6 +34,3 @@ def download_from_gcp(prefix_preprocess, destination_folder):
         blob.download_to_filename(local_filename)
         print(f"Téléchargé : image ({i + 1}/{nb_images})")
 
-if __name__ == "__main__":
-    # download_from_gcp("processed", "processed_data/")
-    upload_to_gcp("test_blobs")
