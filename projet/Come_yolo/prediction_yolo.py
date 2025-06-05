@@ -9,3 +9,4 @@ results = model("/Users/dodohellio/Downloads/Namibie.jpg")
 img = results[0].plot()
 cv2.imshow('YOUPI', img)
 key = cv2.waitKey(0)
+   
