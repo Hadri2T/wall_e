@@ -1,6 +1,7 @@
 raw_data/
 .env
-notebooks
+notebooks/
+
 blobs/
 data/
 
@@ -25,7 +26,10 @@ mlruns
 *.sqlite
 # IDE #
 *.vscode
-
+*.jpg
+*.png
+*.jpeg
+*.ipynb
 
 # Challengify - test challengification files
 *_challengify*
