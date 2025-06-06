@@ -1,6 +1,6 @@
 raw_data/
 .env
-notebooks
+notebooks/
 
 blobs/
 
@@ -28,7 +28,7 @@ mlruns
 *.jpg
 *.png
 *.jpeg
-
+*.ipynb
 
 # Challengify - test challengification files
 *_challengify*
@@ -39,4 +39,3 @@ runs/
 test_blobs/
 tests_blobs/
 processed_data/
-
