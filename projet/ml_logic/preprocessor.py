@@ -6,7 +6,7 @@ import pandas as pd
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-from ml_logic.data import upload_to_gcp
+from projet.ml_logic.data import upload_to_gcp
 
 #Filtrer les images selon le nombres d'objets
 
@@ -123,7 +123,8 @@ def preprocess_and_save_dataset(
     image_folder,
     preprocessed_images_root,
     target_size=(64, 64),
-    gcp=False
+    gcp=False,
+    limit = None
 ):
     ''' csv_path (str) : chemin vers le fichier d’annotations
 
@@ -136,6 +137,8 @@ def preprocess_and_save_dataset(
     gcp (bool) : pour uploader vers GCS '''
 
     df = pd.read_csv(csv_path)
+    if limit:
+        df = df.sample(n=limit, random_state=42)
 
 
     df_resized = resize_bounding_boxes(df, target_size)
@@ -166,8 +169,8 @@ def preprocess_and_save_dataset(
             # Image.fromarray transforme l'array en image
             #.save() permet de le save dans le format que je veux en suivant le chemin que je veux
             Image.fromarray(image_array).save(output_path, format="JPEG")
-            if gcp:
-                upload_to_gcp(from_folder = output_path)
+            # if gcp:
+            #     upload_to_gcp(from_folder = output_path)
 
         except Exception as e:
             print(f"Erreur avec {filename} : {e}")
@@ -177,8 +180,8 @@ def preprocess_and_save_dataset(
         csv_output_path = os.path.join(output_dir, f"resized_annotations_{size_file}_{split_name}.csv")
         df_resized.to_csv(csv_output_path, index=False)
 
-        if gcp:
-            upload_to_gcp(from_folder = csv_output_path)
+    if gcp:
+        upload_to_gcp(from_folder = output_dir)
 
 
     return None
