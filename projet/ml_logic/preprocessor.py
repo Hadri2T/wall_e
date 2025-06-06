@@ -34,15 +34,17 @@ def filter_images(csv_path, min_objects=1, max_objects=None):
 #Redimensionner les images avec du padding si nécessaire
 def resize_with_padding(image_path, target_size=(64, 64)):
 
-    #On lis le contenu du path
-    image_file = tf.io.read_file(image_path)
+    if isinstance(image_path, str):
+        #On lis le contenu du path
+        image_file = tf.io.read_file(image_path)
 
-    #On transforme ce qu'on lit en image
-    image = tf.image.decode_jpeg(image_file, channels=3)
+        #On transforme ce qu'on lit en image
+        image = tf.image.decode_jpeg(image_file, channels=3)
 
-    #Ca marche pas avec des floats au dessus de 1
-    image = tf.image.convert_image_dtype(image, tf.float32)
-
+        #Ca marche pas avec des floats au dessus de 1
+        image = tf.image.convert_image_dtype(image, tf.float32)
+    else:
+        image=image_path
     #tf.shape - Returns a tensor containing the shape of the input tensor.
     image_shape = tf.shape(image)
 

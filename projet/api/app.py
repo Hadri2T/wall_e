@@ -67,9 +67,9 @@ with tabs[1]:
         image = Image.open(uploaded_file)
         st.image(image, caption="Image chargée", use_column_width=True)
 
-        # Ajout possible de prédiction sur image ici
-        # prediction = predict_image(np.array(image))
-        # st.write("Détection :", prediction)
+        st.markdown("Ajout possible de prédiction sur image ici :")
+        prediction = predict_image(np.array(image))
+        st.write("Détection :", prediction)
 
 # === 3. Onglet Classes ===
 with tabs[2]:

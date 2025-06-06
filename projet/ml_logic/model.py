@@ -129,3 +129,16 @@ def train_model(X, y, patience = 5, epochs = 50, input_shape=(128, 128, 3)):
         callbacks=early_stopping
     )
     return model
+
+def load_model(model_path):
+    """
+    Charge le modèle Keras à partir du chemin spécifié.
+
+    Args:
+        model_path (str): Chemin vers le modèle Keras.
+
+    Returns:
+        model : Le modèle chargé.
+    """
+    model = None#Olympe c'est pour toi 
+    return model
