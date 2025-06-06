@@ -37,4 +37,8 @@ def download_from_gcp(prefix_preprocess, limit = None):
 
         # Télécharge le fichier
         blob.download_to_filename(local_filename)
+
         print(f"✅ Téléchargé ({i + 1}/{nb_images}) : {local_filename}")
+
+
+   

@@ -1,6 +1,7 @@
 raw_data/
 .env
 notebooks
+
 blobs/
 
 # OS generated files #
@@ -24,6 +25,9 @@ mlruns
 *.sqlite
 # IDE #
 *.vscode
+*.jpg
+*.png
+*.jpeg
 
 
 # Challengify - test challengification files
