@@ -126,3 +126,16 @@ def model(X, y, early_stopping, input_shape=(128, 128, 3)):
         callbacks=[EarlyStopping(patience=5, restore_best_weights=True)]
     )
     return model
+
+def load_model(model_path):
+    """
+    Charge le modèle Keras à partir du chemin spécifié.
+
+    Args:
+        model_path (str): Chemin vers le modèle Keras.
+
+    Returns:
+        model : Le modèle chargé.
+    """
+    model = None#Olympe c'est pour toi 
+    return model
