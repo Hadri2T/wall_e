@@ -64,4 +64,4 @@ if __name__ == '__main__':
 
     train_yolo(data_yaml_path, epochs, imgsz)
 
-    upload_to_gcp("raw_data/runs_yolo/train5")
+    upload_to_gcp("raw_data/runs_yolo")
