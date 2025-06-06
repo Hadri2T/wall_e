@@ -1,7 +1,11 @@
 #code compelt avec une fonction qui demande si je veux changer le nombre d'epoch et la resolution d'image :
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from ultralytics import YOLO
 from roboflow import Roboflow
+from projet.ml_logic.data import upload_to_gcp
 
 def download_dataset_roboflow():
     rf = Roboflow(api_key="aRxK3L3jdKNj24RDgvNr")
@@ -59,3 +63,5 @@ if __name__ == '__main__':
     epochs, imgsz = get_training_params()
 
     train_yolo(data_yaml_path, epochs, imgsz)
+
+    upload_to_gcp("raw_data/runs_yolo/train5")

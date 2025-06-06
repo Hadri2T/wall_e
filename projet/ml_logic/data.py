@@ -1,5 +1,9 @@
-from pathlib import Path
+import sys
 import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+from pathlib import Path
 from projet.params import *
 from google.cloud import storage
 from urllib.parse import unquote
@@ -7,12 +11,13 @@ from urllib.parse import unquote
 # Upload local → GCP
 def upload_to_gcp(from_folder):
     client = storage.Client()
-    bucket = client.bucket(BUCKET_NAME)
+    bucket = client.bucket("wall-e-bucket1976")
 
     # Parcourt tous les fichiers présents dans le dossier local
     for file in Path(from_folder).rglob('*'):
         if file.is_file():
             destination_path = str(file.relative_to("."))
+            print(destination_path)
             blob = bucket.blob(destination_path)
             blob.upload_from_string(file.read_bytes())
             print(f"✅ Uploadé : {destination_path} → gs://{BUCKET_NAME}/{destination_path}")
@@ -41,4 +46,8 @@ def download_from_gcp(prefix_preprocess, limit = None):
         print(f"✅ Téléchargé ({i + 1}/{nb_images}) : {local_filename}")
 
 
-   
+
+
+if __name__ == "__main__":
+    folder = input("Folder name to upload to GCP : ")
+    upload_to_gcp(folder)
