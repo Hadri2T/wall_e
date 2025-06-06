@@ -123,8 +123,7 @@ def preprocess_and_save_dataset(
     image_folder,
     preprocessed_images_root,
     target_size=(64, 64),
-    gcp=False,
-    limit = None
+    gcp=False
 ):
     ''' csv_path (str) : chemin vers le fichier d’annotations
 
@@ -137,8 +136,6 @@ def preprocess_and_save_dataset(
     gcp (bool) : pour uploader vers GCS '''
 
     df = pd.read_csv(csv_path)
-    if limit:
-        df = df.sample(n=limit, random_state=42)
 
 
     df_resized = resize_bounding_boxes(df, target_size)
