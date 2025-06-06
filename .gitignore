@@ -2,6 +2,7 @@ raw_data/
 .env
 notebooks
 blobs/
+data/
 
 # OS generated files #
 ######################
@@ -35,4 +36,3 @@ runs/
 test_blobs/
 tests_blobs/
 processed_data/
-
