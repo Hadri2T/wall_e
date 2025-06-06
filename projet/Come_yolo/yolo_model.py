@@ -42,7 +42,7 @@ def train_yolo(data_yaml_path, epochs=3, imgsz=64):
     )
 
 if __name__ == '__main__':
-    data_yaml_path = '/Users/comelubrano/code/Hadri2T/wall_e/raw_data/ocean-waste-1/data.yaml'
+    data_yaml_path = 'raw_data/ocean-waste-1/data.yaml'
 
     while True:
         user_input = input('Tu veux télécharger le dataset ? (y/n) : ').strip().lower()
