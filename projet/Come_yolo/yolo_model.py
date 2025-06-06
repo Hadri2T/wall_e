@@ -37,7 +37,7 @@ def train_yolo(data_yaml_path, epochs=3, imgsz=64):
         epochs=epochs,
         imgsz=imgsz,
         save_period=5,
-        project='/Users/comelubrano/code/Hadri2T/wall_e/raw_data/runs_yolo',
+        project='raw_data/runs_yolo',
         batch=16
     )
 
