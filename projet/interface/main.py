@@ -1,5 +1,7 @@
 import pandas as pd
 import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from projet.ml_logic.preprocessor import preprocess_and_save_dataset
 from projet.ml_logic.model import train_model, load_and_preprocess_images
 from projet.ml_logic.data import download_from_gcp
