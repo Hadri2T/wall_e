@@ -2,7 +2,13 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import pandas as pd
-from tensorflow.keras.callbacks import EarlyStopping
+import tensorflow
+import keras
+import keras.callbacks
+from keras.callbacks import EarlyStopping
+from PIL import Image
+import numpy as np
+from keras import Sequential, layers, Input
 
 
 def undersample_class(df, target_class='Plastic', frac=0.2, class_col='class', random_state=42):
@@ -69,7 +75,7 @@ def load_and_preprocess_images(df, image_dir, img_size=(128, 128)):
     y = []
     for _, row in df.iterrows():
         filepath = os.path.join(image_dir, row['filename'])
-        img = Image.open(filepath).convert('RGB').resize(img_size)
+        img = Image.open(filepath).convert('RGB')#.resize(img_size)
         img_array = np.array(img, dtype=np.float32) / 255.  # Normalisation [0,1]
         X.append(img_array)
         y.append(row['encoded_target'])
@@ -82,20 +88,23 @@ def load_and_preprocess_images(df, image_dir, img_size=(128, 128)):
 
 # J'ai besoin que ce soit resize + RGB puis converti en nparray + normalisation
 
-def model(X, y, early_stopping, input_shape=(128, 128, 3)):
+def train_model(X, y, patience = 5, epochs = 50, input_shape=(128, 128, 3)):
     """
     Modèle pour trouver classe quand il y a un seul déchet
 
     Args:
+        X : must be array
         input_shape (tuple): La forme des images en entrée.
 
     Returns:
         model (tf.keras.Model): Le modèle compilé.
     """
-    from tensorflow.keras import Sequential, layers, Input
+
+    early_stopping = [EarlyStopping(patience=patience, restore_best_weights=True)]
+
 
     model = Sequential([
-        Input(shape=(128, 128, 3)),
+        Input(shape=input_shape),
         layers.Rescaling(1./255),
         layers.Conv2D(32, 3, activation='relu'),
         layers.MaxPooling2D(),
@@ -116,7 +125,20 @@ def model(X, y, early_stopping, input_shape=(128, 128, 3)):
         X, y,
         validation_split=0.2,
         batch_size=32,
-        epochs=50,
-        callbacks=[EarlyStopping(patience=5, restore_best_weights=True)]
+        epochs=epochs,
+        callbacks=early_stopping
     )
+    return model
+
+def load_model(model_path):
+    """
+    Charge le modèle Keras à partir du chemin spécifié.
+
+    Args:
+        model_path (str): Chemin vers le modèle Keras.
+
+    Returns:
+        model : Le modèle chargé.
+    """
+    model = None#Olympe c'est pour toi 
     return model
