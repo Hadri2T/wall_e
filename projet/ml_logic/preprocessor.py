@@ -6,6 +6,7 @@ import pandas as pd
 import tensorflow as tf
 import numpy as np
 from PIL import Image
+from projet.ml_logic.data import upload_to_gcp
 
 #Filtrer les images selon le nombres d'objets
 
@@ -30,20 +31,20 @@ def filter_images(csv_path, min_objects=1, max_objects=None):
 
     return filtered_df
 
-
-
 #Redimensionner les images avec du padding si nécessaire
 def resize_with_padding(image_path, target_size=(64, 64)):
 
-    #On lis le contenu du path
-    image_file = tf.io.read_file(image_path)
+    if isinstance(image_path, str):
+        #On lis le contenu du path
+        image_file = tf.io.read_file(image_path)
 
-    #On transforme ce qu'on lit en image
-    image = tf.image.decode_jpeg(image_file, channels=3)
+        #On transforme ce qu'on lit en image
+        image = tf.image.decode_jpeg(image_file, channels=3)
 
-    #Ca marche pas avec des floats au dessus de 1
-    image = tf.image.convert_image_dtype(image, tf.float32)
-
+        #Ca marche pas avec des floats au dessus de 1
+        image = tf.image.convert_image_dtype(image, tf.float32)
+    else:
+        image=image_path
     #tf.shape - Returns a tensor containing the shape of the input tensor.
     image_shape = tf.shape(image)
 
@@ -163,23 +164,23 @@ def preprocess_and_save_dataset(
             # Définir le chemin de sortie
             output_path = os.path.join(output_dir, filename)
 
-            if gcp:
-                # Je sais pas comment envoyer sur le cloud
-                print(f"Image prête pour upload : {filename}")
-            else:
-                # Sauvegarde locale
-                # Image.fromarray transforme l'array en image
-                #.save() permet de le save dans le format que je veux en suivant le chemin que je veux
-                Image.fromarray(image_array).save(output_path, format="JPEG")
+            # Sauvegarde locale
+            # Image.fromarray transforme l'array en image
+            #.save() permet de le save dans le format que je veux en suivant le chemin que je veux
+            Image.fromarray(image_array).save(output_path, format="JPEG")
+            # if gcp:
+            #     upload_to_gcp(from_folder = output_path)
 
         except Exception as e:
             print(f"Erreur avec {filename} : {e}")
 
         # Sauvegarder le CSV des bboxes redimensionnées car elles ont changé de coordonnées
-    if gcp:
-        print("CSV prêt pour upload")
-    else:
+
         csv_output_path = os.path.join(output_dir, f"resized_annotations_{size_file}_{split_name}.csv")
         df_resized.to_csv(csv_output_path, index=False)
+
+    if gcp:
+        upload_to_gcp(from_folder = output_dir)
+
 
     return None
