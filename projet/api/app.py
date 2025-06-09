@@ -8,10 +8,62 @@ import base64
 
 # from projet.ml_logic.model import predict_image  # À activer plus tard
 
-st.set_page_config(page_title="Détection de déchets", layout="wide")
-st.title("🌊 Détection de déchets dans l’eau")
+# ✅ 1. Configuration de la page
+st.set_page_config(
+    page_title="Pour des eaux claires, wall-e fait la guerre aux déchets en mer.",
+    layout="wide"
+)
 
-tabs = st.tabs(["📷 Caméra en direct", "📁 Image", "ℹ️ Classes", "❓À propos"])
+# ✅ 2. Style CSS personnalisé
+st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(to bottom, #00497f, #000000);
+        background-attachment: fixed;
+        color: white;
+    }
+
+    .block-container {
+        background-color: rgba(0, 0, 0, 0);
+    }
+
+    /* Conteneur des onglets */
+    div[data-baseweb="tabs"] {
+        background-color: transparent !important;
+        padding: 10px;
+        border-radius: 12px;
+    }
+
+    /* Style général de tous les onglets (boutons arrondis) */
+    div[data-baseweb="tab"] {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid white !important;
+        border-radius: 999px !important;
+        padding: 8px 20px !important;
+        margin-right: 10px;
+        font-weight: bold;
+        transition: 0.2s ease;
+    }
+
+    /* Onglet actif */
+    div[data-baseweb="tab"][aria-selected="true"] {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        border: 2px solid white !important;
+    }
+
+    /* Hover (optionnel) */
+    div[data-baseweb="tab"]:hover {
+        background-color: rgba(255, 255, 255, 0.25) !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# ✅ 3. Titre de l'application
+st.title("Pour des eaux claires, wall-e fait la guerre aux déchets en mer.")
+
+# ✅ 4. Onglets
+tabs = st.tabs(["Caméra en direct", "Image", "Classes", "À propos"])
 
 # === 1. Onglet Caméra en direct ===
 with tabs[0]:
