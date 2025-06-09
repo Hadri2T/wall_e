@@ -103,7 +103,7 @@ def train_oneclassmodel(X, y, patience = 5, epochs = 50, input_shape=(128, 128, 
     early_stopping = [EarlyStopping(patience=patience, restore_best_weights=True)]
 
 
-    model = Sequential([
+    oneclassmodel = Sequential([
         Input(shape=input_shape),
         layers.Rescaling(1./255),
         layers.Conv2D(32, 3, activation='relu'),
@@ -115,20 +115,20 @@ def train_oneclassmodel(X, y, patience = 5, epochs = 50, input_shape=(128, 128, 
         layers.Dense(3, activation='softmax')  # ← 3 classes = plastique, métal, verre
     ])
 
-    model.compile(
+    oneclassmodel.compile(
     optimizer='adam',
     loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
     )
 
-    model.fit(
+    oneclassmodel.fit(
         X, y,
         validation_split=0.2,
         batch_size=32,
         epochs=epochs,
         callbacks=early_stopping
     )
-    return model
+    return oneclassmodel
 
 def load_model(model_path):
     """
