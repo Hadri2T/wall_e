@@ -52,13 +52,32 @@ if __name__ == "__main__":
     df_train['encoded_target'] = encoder.fit_transform(df_train['class'])
     y_train = df_train['encoded_target']
 
-    X_train, y_train = load_and_preprocess_images(df = df_train,
-                               image_dir = 'data/preprocessed_images_64_test',
-                               img_size=(64, 64))
+    # Choix du modèle
+    choice = input("Quel modèle veux-tu entraîner ? (oneclass / multiclass) : ").strip().lower()
+    if choice not in ["oneclass", "multiclass"]:
+        print("❌ Choix invalide. Veuillez entrer 'oneclass' ou 'multiclass'.")
+        exit()
 
+   # Chargement des images
+    if choice == "oneclass":
+        from projet.ml_logic.oneclass import load_and_preprocess_images, train_oneclassmodel
+    else:
+        from projet.ml_logic.multiclass import load_and_preprocess_images, train_multiclassmodel
 
-    model_one_class = train_oneclassmodel(X_train, y_train, patience = 5, epochs = 1, input_shape=(64, 64, 3))
+    X_train, y_train = load_and_preprocess_images(
+        df=df_train,
+        image_dir='data/preprocessed_images_64_test',
+        img_size=(64, 64)
+    )
 
-    model_one_class_save_path = os.path.join(LOCAL_DATA_DIR, "one_class_model.h5")
-    save_model(model_one_class, model_one_class_save_path)
-    print(f"✅ Modèle sauvegardé à : {model_one_class_save_path}")
+    # Entraînement du modèle
+    if choice == "oneclass":
+        model = train_oneclassmodel(X_train, y_train, patience=5, epochs=5, input_shape=(64, 64, 3))
+        model_save_path = os.path.join(LOCAL_DATA_DIR, "one_class_model.h5")
+    else:
+        model = train_multiclassmodel(X_train, y_train, patience=5, epochs=5, input_shape=(64, 64, 3))
+        model_save_path = os.path.join(LOCAL_DATA_DIR, "multiclass_model.h5")
+
+    # Sauvegarde du modèle
+    save_model(model, model_save_path)
+    print(f"✅ Modèle sauvegardé à : {model_save_path}")
