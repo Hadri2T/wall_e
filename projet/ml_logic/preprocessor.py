@@ -164,20 +164,21 @@ def preprocess_and_save_dataset(
             # Définir le chemin de sortie
             output_path = os.path.join(output_dir, filename)
 
-            # Sauvegarde locale
-            # Image.fromarray transforme l'array en image
+            #Sauvegarde locale
+            #Image.fromarray transforme l'array en image
             #.save() permet de le save dans le format que je veux en suivant le chemin que je veux
             Image.fromarray(image_array).save(output_path, format="JPEG")
-            # if gcp:
-            #     upload_to_gcp(from_folder = output_path)
+            if gcp:
+                upload_to_gcp(from_folder = output_path)
 
         except Exception as e:
             print(f"Erreur avec {filename} : {e}")
 
         # Sauvegarder le CSV des bboxes redimensionnées car elles ont changé de coordonnées
 
-        csv_output_path = os.path.join(output_dir, f"resized_annotations_{size_file}_{split_name}.csv")
-        df_resized.to_csv(csv_output_path, index=False)
+    csv_output_path = os.path.join(output_dir, f"resized_annotations_{size_file}_{split_name}.csv")
+    df_resized.to_csv(csv_output_path, index=False)
+    print(f"Preprocessed save to {csv_output_path}.")
 
     if gcp:
         upload_to_gcp(from_folder = output_dir)
