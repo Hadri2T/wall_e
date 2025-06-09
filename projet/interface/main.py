@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from projet.ml_logic.preprocessor import preprocess_and_save_dataset
-from projet.ml_logic.model import train_model, load_and_preprocess_images
+from projet.ml_logic.oneclass import train_model, load_and_preprocess_images
 from projet.ml_logic.data import download_from_gcp
 import numpy as np
 from projet.params import LOCAL_DATA_DIR, BUCKET_NAME, TARGET_SIZE
