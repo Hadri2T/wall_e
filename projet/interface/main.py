@@ -14,12 +14,12 @@ from keras.models import save_model
 if __name__ == "__main__":
 
     # download_from_gcp(prefix_preprocess= "raw_data/ocean waste.v2i.tensorflow", destination_folder=os.path.join(LOCAL_DATA_DIR, "raw/"))
-    if os.path.isdir('data/raw_data/ocean waste.v2i.tensorflow'):
-        print("Data already exists")
-        pass
+    if not os.path.isdir('data/raw_data/ocean waste.v2i.tensorflow/train'):
+        print("Téléchargement des données depuis GCS...")
+        for split in ["train", "valid", "test"]:
+            download_from_gcp(prefix_preprocess=f"raw_data/ocean waste.v2i.tensorflow/{split}/")
     else:
-        print("Téléchargement des données prétraitées depuis GCS...")
-        download_from_gcp(prefix_preprocess= "raw_data/ocean waste.v2i.tensorflow")
+        print("📁 Données déjà présentes localement.")
 
     if os.path.isdir("data/preprocessed_images_64_train"):
         print("Data already exists")
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     y_train = df_train['encoded_target']
 
     X_train, y_train = load_and_preprocess_images(df = df_train,
-                               image_dir = 'data/preprocessed_images_64_train',
+                               image_dir = 'data/preprocessed_images_64_test',
                                img_size=(64, 64))
 
 
