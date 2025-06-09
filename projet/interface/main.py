@@ -53,7 +53,7 @@ if __name__ == "__main__":
     y_train = df_train['encoded_target']
 
     X_train, y_train = load_and_preprocess_images(df = df_train,
-                               image_dir = 'data/preprocessed_images_64_test',
+                               image_dir = 'data/preprocessed_images_64_train',
                                img_size=(64, 64))
 
 
