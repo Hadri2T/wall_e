@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from projet.ml_logic.preprocessor import preprocess_and_save_dataset
-from projet.ml_logic.model import train_model, load_and_preprocess_images
+from projet.ml_logic.oneclass import train_oneclassmodel, load_and_preprocess_images
 from projet.ml_logic.data import download_from_gcp
 import numpy as np
 from projet.params import LOCAL_DATA_DIR, BUCKET_NAME, TARGET_SIZE
@@ -57,7 +57,7 @@ if __name__ == "__main__":
                                img_size=(64, 64))
 
 
-    model_one_class = train_model(X_train, y_train, patience = 5, epochs = 1, input_shape=(64, 64, 3))
+    model_one_class = train_oneclassmodel(X_train, y_train, patience = 5, epochs = 1, input_shape=(64, 64, 3))
 
     model_one_class_save_path = os.path.join(LOCAL_DATA_DIR, "one_class_model.h5")
     save_model(model_one_class, model_one_class_save_path)
