@@ -48,9 +48,6 @@ def download_from_gcp(prefix_preprocess):
     return local_filename
 
 
-
-
-
 def download_model_from_gcp(nom_model):
     client = storage.Client()
     bucket = client.bucket(BUCKET_NAME)
@@ -76,4 +73,3 @@ def download_model_from_gcp(nom_model):
 if __name__ == "__main__":
     folder = input("Folder name to upload to GCP : ")
     upload_to_gcp(folder)
-
