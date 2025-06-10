@@ -12,6 +12,8 @@ from io import BytesIO
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
+import json
+
 app = FastAPI()
 
 app.add_middleware(
@@ -32,6 +34,10 @@ app.state.models = {
 # Set default model
 app.state.current_model = "yolo"
 print("Models loaded and default set to YOLO")
+
+@app.get("/")
+def root():
+    return {"message": "API de détection de déchets : YOLO et CNN supportés."}
 
 @app.get("/model")
 def choose_model(model_name: str):
@@ -65,7 +71,3 @@ async def predict(file: UploadFile = File(...)):
         img_array = np.expand_dims(img_array, axis=0)
         prediction = model.predict(img_array)
         return {"prediction": prediction[0].tolist()}
-
-@app.get("/")
-def root():
-    return {"message": "API de détection de déchets : YOLO et CNN supportés."}
