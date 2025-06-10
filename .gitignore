@@ -40,7 +40,6 @@ runs/
 test_blobs/
 tests_blobs/
 processed_data/
-saved_models/
 assets/
 variables/
 multiclass.ipynb
