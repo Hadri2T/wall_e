@@ -88,7 +88,7 @@ def load_and_preprocess_images(df, image_dir, img_size=(128, 128)):
 
 # J'ai besoin que ce soit resize + RGB puis converti en nparray + normalisation
 
-def train_oneclassmodel(X, y, patience = 5, epochs = 50, input_shape=(128, 128, 3)):
+def train_oneclassmodel(X, y, patience = 5, epochs = 50, input_shape=(64, 64, 3)):
     """
     Modèle pour trouver classe quand il y a un seul déchet
 

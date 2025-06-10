@@ -1,3 +1,4 @@
+import requests
 import streamlit as st
 import cv2
 import numpy as np
@@ -9,56 +10,18 @@ import requests
 
 BASE_URL = "http://localhost:8000"
 
-# from projet.ml_logic.model import predict_image  # À activer plus tard
-
 st.set_page_config(
     page_title="Pour des eaux claires, wall-e fait la guerre aux déchets en mer.",
     layout="wide"
 )
 
-# === CSS : fond et boutons arrondis ===
-st.markdown("""
-    <style>
-    .stApp {
-        background: linear-gradient(to bottom, #00497f, #000000);
-        background-attachment: fixed;
-        color: white;
-    }
-
-    .block-container {
-        background-color: rgba(0, 0, 0, 0);
-    }
-
-    .nav-button {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid white;
-        border-radius: 999px;
-        padding: 10px 20px;
-        margin-right: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .nav-button:hover {
-        background-color: rgba(255, 255, 255, 0.25);
-    }
-
-    .nav-button-selected {
-        background-color: rgba(255, 255, 255, 0.3);
-        border: 2px solid white;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
 # === Titre
 st.title("Pour des eaux claires, wall-e fait la guerre aux déchets en mer.")
 
 # === Menu de navigation personnalisé
-tabs = ["Image", "Caméra en direct", "Classes", "À propos"]
+tabs = st.tabs(["Caméra en direct", "Image", "Classes", "À propos"])
 
-if "active_tab" not in st.session_state:
+with tabs[0]:
     st.session_state.active_tab = tabs[0]
     # st.subheader("📷 Détection via webcam")
 
@@ -121,43 +84,41 @@ if "active_tab" not in st.session_state:
         unsafe_allow_html=True,
     )
 
-elif st.session_state.active_tab == "Image":
+
+with tabs[1]:
     st.subheader("Choisir un modèle")
     model = st.radio('Choisir un modèle', ('CNN', 'Yolo'), 1)
-    if model == "CNN":
-        model_name = "olympe_model"
-    elif model == "Yolo":
-        model_name = "yolo"
-    requests.get(BASE_URL + "/model", params={
-        "model_name": model_name
-    })
+    model_name = "olympe_model" if model == "CNN" else "yolo"
+    response = requests.get(BASE_URL + "/model", params={"model_name": model_name})
+    if response.status_code == 200:
+        st.success(f"Modèle {model_name} activé")
+    else:
+        st.error("Erreur lors de l’activation du modèle")
+
     st.subheader("📁 Charger une image")
     uploaded_file = st.file_uploader("Choisissez une image", type=["jpg", "jpeg", "png"])
     if uploaded_file:
         image = Image.open(uploaded_file)
         st.image(image, caption="Image chargée", use_column_width=True)
-
-
         files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
-        url_post = BASE_URL+"/predict"
+        url_post = BASE_URL + "/predict"
         response = requests.post(url_post, files=files)
 
-        json = response.json()
+        if response.status_code == 200:
+            json = response.json()
+            if model == "CNN":
+                classes = ["Verre", "Métal", "Plastique"]
+                predicted_class = classes[np.argmax(json["prediction"])]
+                confidence = np.max(json["prediction"])
+                st.success(f"Classe prédite : {predicted_class} avec une confiance de {confidence:.2f}")
+            elif model == "Yolo":
+                for idc, waste_category_idx in enumerate(json["waste_categories"]):
+                    st.write(f"Classe : {waste_category_idx} - Confiance : {json['confidence_score'][idc]:.2f}")
+                st.write(json)
+        else:
+            st.error("Erreur lors de la prédiction")
 
-        if model == "CNN":
-            pass
-        elif model == "Yolo":
-            for idc, waste_category_idx in enumerate(json["waste_categories"]):
-                st.write(waste_category_idx)
-                st.write(json["confidence_score"][idc])
-
-        st.write(response.json())
-
-        st.markdown("Ajout possible de prédiction sur image ici :")
-        # prediction = predict_image(np.array(image))
-        # st.write("Détection :", prediction)
-
-elif st.session_state.active_tab == "Classes":
+with tabs[2]:
 # === 3. Onglet Classes ===
     st.subheader("📦 Classes reconnues")
     st.markdown("""
@@ -167,7 +128,7 @@ elif st.session_state.active_tab == "Classes":
     - ♵ Verre
     """)
 
-elif st.session_state.active_tab == "À propos":
+with tabs[3]:
     st.subheader("❓ À propos")
     st.markdown("""
     Ce projet vise à détecter automatiquement les déchets dans les eaux marines à partir d’images ou de flux vidéo.

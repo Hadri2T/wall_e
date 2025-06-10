@@ -5,6 +5,8 @@ notebooks/
 blobs/
 data/
 
+status/
+
 # OS generated files #
 ######################
 .DS_Store

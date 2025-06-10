@@ -8,6 +8,8 @@ from projet.params import *
 from google.cloud import storage
 from urllib.parse import unquote
 from ultralytics import YOLO
+from projet.params import BUCKET_NAME
+from tensorflow.keras.models import load_model
 import tempfile
 
 # Upload local → GCP
