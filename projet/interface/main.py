@@ -2,12 +2,9 @@ import pandas as pd
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-from projet.ml_logic.preprocessor import preprocess_and_save_dataset
-<<<<<<< HEAD
-from projet.ml_logic.oneclass import train_model, load_and_preprocess_images
-=======
-from projet.ml_logic.oneclass import train_oneclassmodel, load_and_preprocess_images
->>>>>>> ddd2bca05e39e861c0aca78107501f5e76de07c5
+from projet.ml_logic.preprocessor import preprocess_and_save_dataset, filter_images
+from projet.ml_logic.multiclass import train_multiclassmodel, load_and_preprocess_images
+from projet.ml_logic.oneclass import train_oneclassmodel, load_and_preprocess_images, undersample_class, class_proportion
 from projet.ml_logic.data import download_from_gcp
 import numpy as np
 from projet.params import LOCAL_DATA_DIR, BUCKET_NAME, TARGET_SIZE
@@ -51,10 +48,7 @@ if __name__ == "__main__":
     df_train = pd.read_csv('data/preprocessed_images_64_train/resized_annotations_64_train.csv')
 
     print(df_train)
-
-    encoder = LabelEncoder()
-    df_train['encoded_target'] = encoder.fit_transform(df_train['class'])
-    y_train = df_train['encoded_target']
+    print(class_proportion(df_train, col='class'))
 
     # Choix du modèle
     choice = input("Quel modèle veux-tu entraîner ? (oneclass / multiclass) : ").strip().lower()
@@ -62,24 +56,33 @@ if __name__ == "__main__":
         print("❌ Choix invalide. Veuillez entrer 'oneclass' ou 'multiclass'.")
         exit()
 
-   # Chargement des images
+
+    # Chargement des images
     if choice == "oneclass":
-        from projet.ml_logic.oneclass import load_and_preprocess_images, train_oneclassmodel
+        df_train = filter_images(df_train, min_objects=1, max_objects=1)
+        df_train = undersample_class(df_train, target_class="Plastic", frac=0.2, class_col='class', random_state=42)
+
     else:
         from projet.ml_logic.multiclass import load_and_preprocess_images, train_multiclassmodel
 
+    encoder = LabelEncoder()
+    df_train['encoded_target'] = encoder.fit_transform(df_train['class'])
+
     X_train, y_train = load_and_preprocess_images(
         df=df_train,
-        image_dir='data/preprocessed_images_64_test',
+        image_dir='data/preprocessed_images_64_train',
         img_size=(64, 64)
     )
 
+    print(df_train)
+    print(class_proportion(df_train, col='class'))
+
     # Entraînement du modèle
     if choice == "oneclass":
-        model = train_oneclassmodel(X_train, y_train, patience=5, epochs=5, input_shape=(64, 64, 3))
+        model = train_oneclassmodel(X_train, y_train, patience=5, epochs=50, input_shape=(64, 64, 3))
         model_save_path = os.path.join(LOCAL_DATA_DIR, "one_class_model.h5")
     else:
-        model = train_multiclassmodel(X_train, y_train, patience=5, epochs=5, input_shape=(64, 64, 3))
+        model = train_multiclassmodel(X_train, y_train, patience=5, epochs=200, input_shape=(64, 64, 3))
         model_save_path = os.path.join(LOCAL_DATA_DIR, "multiclass_model.h5")
 
     # Sauvegarde du modèle

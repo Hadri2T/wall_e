@@ -88,7 +88,7 @@ def load_and_preprocess_images(df, image_dir, img_size=(128, 128)):
 
 # J'ai besoin que ce soit resize + RGB puis converti en nparray + normalisation
 
-def train_multiclassmodel(X, y, patience = 5, epochs = 50, input_shape=(128, 128, 3)):
+def train_multiclassmodel(X, y, patience = 5, epochs = 200, input_shape=(64, 64, 3)):
     """
     Modèle CNN pour la classification multilabel (plusieurs déchets par image).
 
@@ -102,7 +102,7 @@ def train_multiclassmodel(X, y, patience = 5, epochs = 50, input_shape=(128, 128
         model (tf.keras.Model): Modèle compilé et entraîné
     """
     multiclassmodel = Sequential([
-    Input(shape=(128, 128, 3)),
+    Input(shape=input_shape),
     layers.Rescaling(1./255),
 
     layers.Conv2D(64, 3, padding='same', activation='relu'),
@@ -132,6 +132,17 @@ def train_multiclassmodel(X, y, patience = 5, epochs = 50, input_shape=(128, 128
         optimizer='adam',
         loss='mse',
         metrics=['mae']
+    )
+
+    multiclassmodel.fit(
+        X, y,
+        validation_split=0.2,
+        epochs=epochs,
+        batch_size=32,
+        callbacks=[
+            EarlyStopping(patience=patience, restore_best_weights=True)
+        ],
+        verbose=1
     )
 
     return multiclassmodel

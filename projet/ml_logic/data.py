@@ -8,7 +8,6 @@ from projet.params import *
 from google.cloud import storage
 from urllib.parse import unquote
 from ultralytics import YOLO
-from projet.ml_logic.model import load_model
 import tempfile
 
 # Upload local → GCP
@@ -76,4 +75,3 @@ def download_model_from_gcp(nom_model):
 if __name__ == "__main__":
     folder = input("Folder name to upload to GCP : ")
     upload_to_gcp(folder)
-
