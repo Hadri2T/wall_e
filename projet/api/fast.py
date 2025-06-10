@@ -1,52 +1,71 @@
 import pandas as pd
 import numpy as np
 import cv2
+import tensorflow as tf
 
 from projet.ml_logic.data import download_model_from_gcp
 from projet.ml_logic.preprocessor import resize_with_padding
-from fastapi import UploadFile, File
+from fastapi import UploadFile, File, FastAPI, Request
 from PIL import Image
 from io import BytesIO
 
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 app = FastAPI()
-print("FastAPI app created")
 
-app.state.model = download_model_from_gcp('yolo')
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-print("Model loaded and stored in app.state.model")
+# === Load both models ===
+app.state.models = {
+    "yolo": download_model_from_gcp('yolo'),
+    "olympe_model": download_model_from_gcp("olympe_model")
 
-#predict grace à un yolo et adapter uniquement à yolo
+}
+
+# Set default model
+app.state.current_model = "yolo"
+print("Models loaded and default set to YOLO")
+
+@app.get("/model")
+def choose_model(model_name: str):
+    if model_name not in app.state.models:
+        return {"error": f"Model '{model_name}' not found."}
+    app.state.current_model = model_name
+    return {"message": f"Model '{model_name}' selected."}
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    # Lire l'image uploadée
     contents = await file.read()
-
-    # Convertir en image RGB
     image = Image.open(BytesIO(contents)).convert("RGB")
-
-    # Convertir en tableau numpy pour YOLO
     img_np = np.array(image)
-    processed_img = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
 
-    # Prédiction avec YOLO
-    model = app.state.model
-    results = model.predict(processed_img)
+    model_name = app.state.current_model
+    model = app.state.models[model_name]
 
-    boxes = results[0].boxes
-    waste_categories = boxes.cls.numpy().tolist()
-    confidence_score = boxes.conf.numpy().tolist()
-    bounding_boxes = boxes.xyxy.numpy().tolist()
+    if model_name == "yolo":
+        processed_img = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+        results = model.predict(processed_img)
+        boxes = results[0].boxes
+        return {
+            "waste_categories": boxes.cls.numpy().tolist(),
+            "confidence_score": boxes.conf.numpy().tolist(),
+            "bounding_boxes": boxes.xyxy.numpy().tolist()
+        }
 
-    last_prediction = {
-        "waste_categories": waste_categories,
-        "confidence_score": confidence_score,
-        "bounding_boxes": bounding_boxes
-    }
-    return last_prediction
+    elif model_name == "olympe_model":
+        img_resized = image.resize((64, 64))
+        img_array = np.array(img_resized) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        prediction = model.predict(img_array)
+        return {"prediction": prediction[0].tolist()}
 
 @app.get("/")
 def root():
-    return dict(greeting="Adri le goat")
+    return {"message": "API de détection de déchets : YOLO et CNN supportés."}

@@ -1,3 +1,4 @@
+import requests
 import streamlit as st
 import cv2
 import numpy as np
@@ -6,114 +7,53 @@ import time
 import os
 import base64
 
-# from projet.ml_logic.model import predict_image  # À activer plus tard
+BASE_URL = "http://localhost:8000"
 
-# ✅ 1. Configuration de la page
 st.set_page_config(
     page_title="Pour des eaux claires, wall-e fait la guerre aux déchets en mer.",
     layout="wide"
 )
 
-# ✅ 2. Style CSS personnalisé
-st.markdown("""
-    <style>
-    .stApp {
-        background: linear-gradient(to bottom, #00497f, #000000);
-        background-attachment: fixed;
-        color: white;
-    }
+# st.markdown("""
+#     <style>
+#     .stApp {
+#         background: linear-gradient(to bottom, #00497f, #000000);
+#         background-attachment: fixed;
+#         color: white;
+#     }
+#     .block-container {
+#         background-color: rgba(0, 0, 0, 0);
+#     }
+#     div[data-baseweb="tabs"] {
+#         background-color: transparent !important;
+#         padding: 10px;
+#         border-radius: 12px;
+#     }
+#     div[data-baseweb="tab"] {
+#         background-color: rgba(255, 255, 255, 0.1) !important;
+#         color: white !important;
+#         border: 1px solid white !important;
+#         border-radius: 999px !important;
+#         padding: 8px 20px !important;
+#         margin-right: 10px;
+#         font-weight: bold;
+#         transition: 0.2s ease;
+#     }
+#     div[data-baseweb="tab"][aria-selected="true"] {
+#         background-color: rgba(255, 255, 255, 0.2) !important;
+#         border: 2px solid white !important;
+#     }
+#     div[data-baseweb="tab"]:hover {
+#         background-color: rgba(255, 255, 255, 0.25) !important;
+#     }
+#     </style>
+# """, unsafe_allow_html=True)
 
-    .block-container {
-        background-color: rgba(0, 0, 0, 0);
-    }
-
-    /* Conteneur des onglets */
-    div[data-baseweb="tabs"] {
-        background-color: transparent !important;
-        padding: 10px;
-        border-radius: 12px;
-    }
-
-    /* Style général de tous les onglets (boutons arrondis) */
-    div[data-baseweb="tab"] {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
-        border: 1px solid white !important;
-        border-radius: 999px !important;
-        padding: 8px 20px !important;
-        margin-right: 10px;
-        font-weight: bold;
-        transition: 0.2s ease;
-    }
-
-    /* Onglet actif */
-    div[data-baseweb="tab"][aria-selected="true"] {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        border: 2px solid white !important;
-    }
-
-    /* Hover (optionnel) */
-    div[data-baseweb="tab"]:hover {
-        background-color: rgba(255, 255, 255, 0.25) !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# ✅ 3. Titre de l'application
 st.title("Pour des eaux claires, wall-e fait la guerre aux déchets en mer.")
 
-# ✅ 4. Onglets
 tabs = st.tabs(["Caméra en direct", "Image", "Classes", "À propos"])
 
-# === 1. Onglet Caméra en direct ===
 with tabs[0]:
-    # st.subheader("📷 Détection via webcam")
-
-    # if "camera_active" not in st.session_state:
-    #     st.session_state.camera_active = False
-    # if "run_once" not in st.session_state:
-    #     st.session_state.run_once = False
-
-    # col1, col2 = st.columns(2)
-    # with col1:
-    #     if st.button("▶️ Lancer la caméra"):
-    #         st.session_state.camera_active = True
-    #         st.session_state.run_once = False
-    # with col2:
-    #     if st.button("⏹️ Arrêter la caméra"):
-    #         st.session_state.camera_active = False
-
-    # stframe = st.empty()
-
-    # if st.session_state.camera_active and not st.session_state.run_once:
-    #     st.session_state.run_once = True
-    #     cap = cv2.VideoCapture(0)
-
-    #     if not cap.isOpened():
-    #         st.error("❌ Impossible d’ouvrir la caméra.")
-    #         st.session_state.camera_active = False
-    #     else:
-    #         st.info("Caméra activée. Appuyez sur 'Arrêter la caméra' pour couper.")
-    #         while st.session_state.camera_active:
-    #             ret, frame = cap.read()
-    #             if not ret:
-    #                 st.warning("Erreur de lecture de la caméra.")
-    #                 break
-
-    #             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-    #             # predict_image(frame_rgb) par ex.
-    #             # prediction = predict_image(frame_rgb)
-    #             # st.write("Détection :", prediction)
-
-    #             stframe.image(frame_rgb, channels="RGB")
-    #             time.sleep(0.03)
-
-    #         cap.release()
-    #         stframe.empty()
-    #         st.success("✅ Caméra arrêtée.")
-
-
     gif_path = os.path.join(os.path.dirname(__file__), "0609.gif")
     with open(gif_path, "rb") as file_:
         contents = file_.read()
@@ -128,30 +68,40 @@ with tabs[0]:
         unsafe_allow_html=True,
     )
 
-# === 2. Onglet Image ===
 with tabs[1]:
+    st.subheader("Choisir un modèle")
+    model = st.radio('Choisir un modèle', ('CNN', 'Yolo'), 1)
+    model_name = "olympe_model" if model == "CNN" else "yolo"
+    response = requests.get(BASE_URL + "/model", params={"model_name": model_name})
+    if response.status_code == 200:
+        st.success(f"Modèle {model_name} activé")
+    else:
+        st.error("Erreur lors de l’activation du modèle")
+
     st.subheader("📁 Charger une image")
     uploaded_file = st.file_uploader("Choisissez une image", type=["jpg", "jpeg", "png"])
     if uploaded_file:
         image = Image.open(uploaded_file)
         st.image(image, caption="Image chargée", use_column_width=True)
 
-        st.markdown("Ajout possible de prédiction sur image ici :")
-        prediction = predict_image(np.array(image))
-        st.write("Détection :", prediction)
+        files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
+        url_post = BASE_URL + "/predict"
+        response = requests.post(url_post, files=files)
 
-    camera_photo = st.camera_input("Prenez une photo")
-    if camera_photo is not None:
-        image = Image.open(camera_photo)
-        st.image(image, caption="Photo prise", use_column_width=True)
+        if response.status_code == 200:
+            json = response.json()
+            if model == "CNN":
+                classes = ["Verre", "Métal", "Plastique"]
+                predicted_class = classes[np.argmax(json["prediction"])]
+                confidence = np.max(json["prediction"])
+                st.success(f"Classe prédite : {predicted_class} avec une confiance de {confidence:.2f}")
+            elif model == "Yolo":
+                for idc, waste_category_idx in enumerate(json["waste_categories"]):
+                    st.write(f"Classe : {waste_category_idx} - Confiance : {json['confidence_score'][idc]:.2f}")
+                st.write(json)
+        else:
+            st.error("Erreur lors de la prédiction")
 
-        st.markdown("Ajout possible de prédiction sur image ici :")
-        prediction = predict_image(np.array(image))
-        st.write("Détection :", prediction)
-
-
-
-# === 3. Onglet Classes ===
 with tabs[2]:
     st.subheader("📦 Classes reconnues")
     st.markdown("""
@@ -161,7 +111,6 @@ with tabs[2]:
     - ♵ Verre
     """)
 
-# === 4. Onglet À propos ===
 with tabs[3]:
     st.subheader("❓ À propos")
     st.markdown("""

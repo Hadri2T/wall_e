@@ -76,6 +76,7 @@ if __name__ == "__main__":
 
     print(df_train)
     print(class_proportion(df_train, col='class'))
+    print("Ordre des classes appris par LabelEncoder :", list(encoder.classes_))
 
     # Entraînement du modèle
     if choice == "oneclass":
