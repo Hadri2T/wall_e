@@ -22,7 +22,7 @@ if __name__ == "__main__":
     else:
         print("📁 Données déjà présentes localement.")
 
-    if os.path.isdir("data/preprocessed_images_64_train"):
+    if os.path.isdir("data/preprocessed_images_128_train"):
         print("Data already exists")
     else:
         print("Prétraitement des données...")
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     print(f"{csv_path = }")
 
-    df_train = pd.read_csv('data/preprocessed_images_64_train/resized_annotations_64_train.csv')
+    df_train = pd.read_csv('data/preprocessed_images_128_train/resized_annotations_128_train.csv')
 
     print(df_train)
     print(class_proportion(df_train, col='class'))
@@ -70,8 +70,8 @@ if __name__ == "__main__":
 
     X_train, y_train = load_and_preprocess_images(
         df=df_train,
-        image_dir='data/preprocessed_images_64_train',
-        img_size=(64, 64)
+        image_dir='data/preprocessed_images_128_train',
+        img_size=(128, 128)
     )
 
     print(df_train)
@@ -79,10 +79,10 @@ if __name__ == "__main__":
 
     # Entraînement du modèle
     if choice == "oneclass":
-        model = train_oneclassmodel(X_train, y_train, patience=5, epochs=50, input_shape=(64, 64, 3))
+        model = train_oneclassmodel(X_train, y_train, patience=5, epochs=50, input_shape=(128, 128, 3))
         model_save_path = os.path.join(LOCAL_DATA_DIR, "one_class_model.h5")
     else:
-        model = train_multiclassmodel(X_train, y_train, patience=5, epochs=200, input_shape=(64, 64, 3))
+        model = train_multiclassmodel(X_train, y_train, patience=5, epochs=200, input_shape=(128, 128, 3))
         model_save_path = os.path.join(LOCAL_DATA_DIR, "multiclass_model.h5")
 
     # Sauvegarde du modèle
