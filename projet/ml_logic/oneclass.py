@@ -130,6 +130,7 @@ def train_oneclassmodel(X, y, patience = 5, epochs = 50, input_shape=(128, 128, 
     )
     return oneclassmodel
 
+
 def load_model(model_path):
     """
     Charge le modèle Keras à partir du chemin spécifié.

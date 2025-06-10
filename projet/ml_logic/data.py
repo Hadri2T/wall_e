@@ -8,7 +8,6 @@ from projet.params import *
 from google.cloud import storage
 from urllib.parse import unquote
 from ultralytics import YOLO
-from projet.ml_logic.model import load_model
 import tempfile
 
 # Upload local → GCP

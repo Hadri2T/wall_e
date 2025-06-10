@@ -13,26 +13,23 @@ from projet.ml_logic.data import upload_to_gcp
 
 #Filtrer les images selon le nombres d'objets
 
-def filter_images(csv_path, min_objects=1, max_objects=None):
-#csv_path = chemin vers le csv --> str
-#min_objects = nombre minimum d'objets à garder --> int
-#max_object = nomber maximum d'objets à garder --> int
+def filter_images(df, min_objects=1, max_objects=1):
+    """
+    Filtrer un DataFrame pour ne conserver que les images contenant entre `min_objects` et `max_objects` objets.
 
-    df = pd.read_csv(csv_path)
+    Args:
+        df (pd.DataFrame): Le DataFrame contenant les annotations.
+        min_objects (int): Nombre minimum d'objets par image.
+        max_objects (int): Nombre maximum d'objets par image.
 
-    #Compter le nombre d'occurence des noms des images
-    count = df["filename"].value_counts()
-
-    # Filtrer selon les bornes min/max
-    if max_objects is not None:
-        valid_filenames = count[(count >= min_objects) & (count <= max_objects)].index
-    else:
-        valid_filenames = count[count >= min_objects].index
-
-    # Garder uniquement les lignes correspondantes
-    filtered_df = df[df['filename'].isin(valid_filenames)]
-
+    Returns:
+        pd.DataFrame: Un DataFrame filtré.
+    """
+    counts = df.groupby('filename').size()
+    valid_filenames = counts[(counts >= min_objects) & (counts <= max_objects)].index
+    filtered_df = df[df['filename'].isin(valid_filenames)].copy()
     return filtered_df
+
 
 #Redimensionner les images avec du padding si nécessaire
 def resize_with_padding(image_path, target_size=(64, 64)):
