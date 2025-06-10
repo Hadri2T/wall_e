@@ -35,7 +35,7 @@ def get_training_params(default_epochs=3, default_imgsz=64):
     return epochs, imgsz
 
 def train_yolo(data_yaml_path, epochs=3, imgsz=64):
-    model = YOLO('yolov8n.pt')
+    model = YOLO("yolov8n.pt")  # Démarre avec le modèle pré-entraîné
     model.train(
         data=data_yaml_path,
         epochs=epochs,
@@ -45,8 +45,13 @@ def train_yolo(data_yaml_path, epochs=3, imgsz=64):
         batch=16
     )
 
+    # Sauvegarder le modèle entraîné
+    model_path = "raw_data/runs_yolo/train/weights/best.pt"
+    print(f"Modèle entraîné sauvegardé ici : {model_path}")
+
+
 if __name__ == '__main__':
-    data_yaml_path = 'raw_data/ocean-waste-1/data.yaml'
+    data_yaml_path = '/Users/comelubrano/code/Hadri2T/wall_e/raw_data/ocean-waste-1/ocean waste.v2i.yolov11/data.yaml'
 
     while True:
         user_input = input('Tu veux télécharger le dataset ? (y/n) : ').strip().lower()
