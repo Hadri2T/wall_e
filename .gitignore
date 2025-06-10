@@ -12,7 +12,7 @@ __MACOSX
 # Jupiter Notebook #
 .pytest_cache
 __pycache__
-*checkpoint.ipynb
+*.ipynb
 *.ipynb_checkpoints
 
 # inteliJ #
@@ -40,3 +40,7 @@ runs/
 test_blobs/
 tests_blobs/
 processed_data/
+assets/
+variables/
+multiclass.ipynb
+olympe.ipynb

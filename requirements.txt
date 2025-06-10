@@ -13,6 +13,7 @@ google-api-core==2.8.2
 googleapis-common-protos==1.56.4
 protobuf==3.19.6
 python-dotenv
+scikit-learn
 
 # API
 fastapi==0.108.0

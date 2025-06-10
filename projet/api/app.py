@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 from PIL import Image
 import time
+import os
+import base64
 import requests
 
 BASE_URL = "http://localhost:8000"
@@ -58,57 +60,66 @@ tabs = ["Image", "Caméra en direct", "Classes", "À propos"]
 
 if "active_tab" not in st.session_state:
     st.session_state.active_tab = tabs[0]
+    # st.subheader("📷 Détection via webcam")
 
-cols = st.columns(len(tabs))
-for i, tab in enumerate(tabs):
-    btn_style = "nav-button"
-    if st.session_state.active_tab == tab:
-        btn_style += " nav-button-selected"
-    if cols[i].button(tab, key=f"tab_{i}"):
-        st.session_state.active_tab = tab
+    # if "camera_active" not in st.session_state:
+    #     st.session_state.camera_active = False
+    # if "run_once" not in st.session_state:
+    #     st.session_state.run_once = False
 
-# === Affichage selon l’onglet actif ===
-if st.session_state.active_tab == "Caméra en direct":
-    st.subheader("📷 Détection via webcam")
+    # col1, col2 = st.columns(2)
+    # with col1:
+    #     if st.button("▶️ Lancer la caméra"):
+    #         st.session_state.camera_active = True
+    #         st.session_state.run_once = False
+    # with col2:
+    #     if st.button("⏹️ Arrêter la caméra"):
+    #         st.session_state.camera_active = False
 
-    if "camera_active" not in st.session_state:
-        st.session_state.camera_active = False
-    if "run_once" not in st.session_state:
-        st.session_state.run_once = False
+    # stframe = st.empty()
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("▶️ Lancer la caméra"):
-            st.session_state.camera_active = True
-            st.session_state.run_once = False
-    with col2:
-        if st.button("⏹️ Arrêter la caméra"):
-            st.session_state.camera_active = False
+    # if st.session_state.camera_active and not st.session_state.run_once:
+    #     st.session_state.run_once = True
+    #     cap = cv2.VideoCapture(0)
 
-    stframe = st.empty()
+    #     if not cap.isOpened():
+    #         st.error("❌ Impossible d’ouvrir la caméra.")
+    #         st.session_state.camera_active = False
+    #     else:
+    #         st.info("Caméra activée. Appuyez sur 'Arrêter la caméra' pour couper.")
+    #         while st.session_state.camera_active:
+    #             ret, frame = cap.read()
+    #             if not ret:
+    #                 st.warning("Erreur de lecture de la caméra.")
+    #                 break
 
-    if st.session_state.camera_active and not st.session_state.run_once:
-        st.session_state.run_once = True
-        cap = cv2.VideoCapture(0)
+    #             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        if not cap.isOpened():
-            st.error("❌ Impossible d’ouvrir la caméra.")
-            st.session_state.camera_active = False
-        else:
-            st.info("Caméra activée. Appuyez sur 'Arrêter la caméra' pour couper.")
-            while st.session_state.camera_active:
-                ret, frame = cap.read()
-                if not ret:
-                    st.warning("Erreur de lecture de la caméra.")
-                    break
+    #             # predict_image(frame_rgb) par ex.
+    #             # prediction = predict_image(frame_rgb)
+    #             # st.write("Détection :", prediction)
 
-                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                stframe.image(frame_rgb, channels="RGB")
-                time.sleep(0.03)
+    #             stframe.image(frame_rgb, channels="RGB")
+    #             time.sleep(0.03)
 
-            cap.release()
-            stframe.empty()
-            st.success("✅ Caméra arrêtée.")
+    #         cap.release()
+    #         stframe.empty()
+    #         st.success("✅ Caméra arrêtée.")
+
+
+    gif_path = os.path.join(os.path.dirname(__file__), "0609.gif")
+    with open(gif_path, "rb") as file_:
+        contents = file_.read()
+    data_url = base64.b64encode(contents).decode("utf-8")
+
+    st.markdown(
+        f'''
+        <div style="display: flex; justify-content: center; align-items: center; height: 90vh;">
+            <img src="data:image/gif;base64,{data_url}" alt="cat gif" style="max-width: 100vw; max-height: 85vh; width: 100vw; height: 85vh; object-fit: contain; display: block;"/>
+        </div>
+        ''',
+        unsafe_allow_html=True,
+    )
 
 elif st.session_state.active_tab == "Image":
     st.subheader("Choisir un modèle")
@@ -147,6 +158,7 @@ elif st.session_state.active_tab == "Image":
         # st.write("Détection :", prediction)
 
 elif st.session_state.active_tab == "Classes":
+# === 3. Onglet Classes ===
     st.subheader("📦 Classes reconnues")
     st.markdown("""
     Le modèle reconnaît les types de déchets suivants :
