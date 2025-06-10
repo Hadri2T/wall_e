@@ -5,16 +5,18 @@ from PIL import Image
 import time
 import os
 import base64
+import requests
+
+BASE_URL = "http://localhost:8000"
 
 # from projet.ml_logic.model import predict_image  # À activer plus tard
 
-# ✅ 1. Configuration de la page
 st.set_page_config(
     page_title="Pour des eaux claires, wall-e fait la guerre aux déchets en mer.",
     layout="wide"
 )
 
-# ✅ 2. Style CSS personnalisé
+# === CSS : fond et boutons arrondis ===
 st.markdown("""
     <style>
     .stApp {
@@ -27,46 +29,37 @@ st.markdown("""
         background-color: rgba(0, 0, 0, 0);
     }
 
-    /* Conteneur des onglets */
-    div[data-baseweb="tabs"] {
-        background-color: transparent !important;
-        padding: 10px;
-        border-radius: 12px;
-    }
-
-    /* Style général de tous les onglets (boutons arrondis) */
-    div[data-baseweb="tab"] {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
-        border: 1px solid white !important;
-        border-radius: 999px !important;
-        padding: 8px 20px !important;
+    .nav-button {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid white;
+        border-radius: 999px;
+        padding: 10px 20px;
         margin-right: 10px;
         font-weight: bold;
-        transition: 0.2s ease;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
     }
 
-    /* Onglet actif */
-    div[data-baseweb="tab"][aria-selected="true"] {
-        background-color: rgba(255, 255, 255, 0.2) !important;
-        border: 2px solid white !important;
+    .nav-button:hover {
+        background-color: rgba(255, 255, 255, 0.25);
     }
 
-    /* Hover (optionnel) */
-    div[data-baseweb="tab"]:hover {
-        background-color: rgba(255, 255, 255, 0.25) !important;
+    .nav-button-selected {
+        background-color: rgba(255, 255, 255, 0.3);
+        border: 2px solid white;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# ✅ 3. Titre de l'application
+# === Titre
 st.title("Pour des eaux claires, wall-e fait la guerre aux déchets en mer.")
 
-# ✅ 4. Onglets
-tabs = st.tabs(["Caméra en direct", "Image", "Classes", "À propos"])
+# === Menu de navigation personnalisé
+tabs = ["Image", "Caméra en direct", "Classes", "À propos"]
 
-# === 1. Onglet Caméra en direct ===
-with tabs[0]:
+if "active_tab" not in st.session_state:
+    st.session_state.active_tab = tabs[0]
     # st.subheader("📷 Détection via webcam")
 
     # if "camera_active" not in st.session_state:
@@ -128,31 +121,44 @@ with tabs[0]:
         unsafe_allow_html=True,
     )
 
-# === 2. Onglet Image ===
-with tabs[1]:
+elif st.session_state.active_tab == "Image":
+    st.subheader("Choisir un modèle")
+    model = st.radio('Choisir un modèle', ('CNN', 'Yolo'), 1)
+    if model == "CNN":
+        model_name = "olympe_model"
+    elif model == "Yolo":
+        model_name = "yolo"
+    requests.get(BASE_URL + "/model", params={
+        "model_name": model_name
+    })
     st.subheader("📁 Charger une image")
     uploaded_file = st.file_uploader("Choisissez une image", type=["jpg", "jpeg", "png"])
     if uploaded_file:
         image = Image.open(uploaded_file)
         st.image(image, caption="Image chargée", use_column_width=True)
 
+
+        files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
+        url_post = BASE_URL+"/predict"
+        response = requests.post(url_post, files=files)
+
+        json = response.json()
+
+        if model == "CNN":
+            pass
+        elif model == "Yolo":
+            for idc, waste_category_idx in enumerate(json["waste_categories"]):
+                st.write(waste_category_idx)
+                st.write(json["confidence_score"][idc])
+
+        st.write(response.json())
+
         st.markdown("Ajout possible de prédiction sur image ici :")
-        prediction = predict_image(np.array(image))
-        st.write("Détection :", prediction)
+        # prediction = predict_image(np.array(image))
+        # st.write("Détection :", prediction)
 
-    camera_photo = st.camera_input("Prenez une photo")
-    if camera_photo is not None:
-        image = Image.open(camera_photo)
-        st.image(image, caption="Photo prise", use_column_width=True)
-
-        st.markdown("Ajout possible de prédiction sur image ici :")
-        prediction = predict_image(np.array(image))
-        st.write("Détection :", prediction)
-
-
-
+elif st.session_state.active_tab == "Classes":
 # === 3. Onglet Classes ===
-with tabs[2]:
     st.subheader("📦 Classes reconnues")
     st.markdown("""
     Le modèle reconnaît les types de déchets suivants :
@@ -161,8 +167,7 @@ with tabs[2]:
     - ♵ Verre
     """)
 
-# === 4. Onglet À propos ===
-with tabs[3]:
+elif st.session_state.active_tab == "À propos":
     st.subheader("❓ À propos")
     st.markdown("""
     Ce projet vise à détecter automatiquement les déchets dans les eaux marines à partir d’images ou de flux vidéo.
