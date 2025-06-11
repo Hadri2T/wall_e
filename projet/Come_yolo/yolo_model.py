@@ -46,7 +46,6 @@ def train_yolo(data_yaml_path, epochs=3, imgsz=64):
         project='raw_data/runs_yolo',
         batch=16
     )
-
     # Sauvegarder le modèle entraîné
     model_path = "raw_data/runs_yolo/train/weights/best.pt"
     print(f"Modèle entraîné sauvegardé ici : {model_path}")
