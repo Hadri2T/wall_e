@@ -2,13 +2,27 @@ import requests
 import streamlit as st
 import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 import time
 import os
 import base64
 import requests
 
 BASE_URL = "http://localhost:8000"
+
+YOLO_CLASSES = [
+    "1", "2", "4", "Beverage Cans", "Bolsa", "Botella", "Bottle", "Bottle cap", "Branch",
+    "Bungkus Makanan", "Can", "Fishing wastes", "Glass Bottles", "Glass wastes", "Juice Box",
+    "Juice box", "Kantong Plastik", "Metal wastes", "Natural wastes", "Paper", "Plastic",
+    "Plastic Bags", "Plastic Bottle", "Plastic Bottles", "Plastic bag", "Plastic bottle",
+    "Plastic cup", "Plastic packaging", "Plastic wastes", "Plastic-Bottle", "Plastic-Bottles",
+    "Plastics Container", "Plastics Trash", "Plato", "Red de pesca", "Trash", "Undefined trash",
+    "Vaso", "Waste", "Wood", "Wood wastes", "botellas-de-plastico", "bottle", "bouteille", "can",
+    "cardboard", "dechet", "drink can", "drink carton", "fishing_net", "foam", "glass",
+    "glass-bottle", "metal", "misc", "other", "paper", "pbag", "pbottle", "pet bottle",
+    "petbottle", "plastic", "plastic bottle", "plastic_ silverware", "plastic_bag", "plastic_bags",
+    "plastic_bottle", "plastic_cup", "plastic_mug", "plastic_plates"
+]
 
 st.set_page_config(
     page_title="Pour des eaux claires, wall-e fait la guerre aux déchets en mer.",
@@ -112,9 +126,16 @@ with tabs[1]:
                 confidence = np.max(json["prediction"])
                 st.success(f"Classe prédite : {predicted_class} avec une confiance de {confidence:.2f}")
             elif model == "Yolo":
+                draw = ImageDraw.Draw(image)
                 for idc, waste_category_idx in enumerate(json["waste_categories"]):
-                    st.write(f"Classe : {waste_category_idx} - Confiance : {json['confidence_score'][idc]:.2f}")
-                st.write(json)
+                    idx = int(waste_category_idx)
+                    label = YOLO_CLASSES[idx] if idx < len(YOLO_CLASSES) else f"Inconnu ({idx})"
+                    st.write(f"Classe : {label} - Confiance : {json['confidence_score'][idc]:.2f}")
+
+                    x1, y1, x2, y2 = map(int, json["bounding_boxes"][idc])
+                    draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
+                    draw.text((x1, y1), label, fill="red")
+                st.image(image, caption="Image avec bounding boxes", use_column_width=True)
         else:
             st.error("Erreur lors de la prédiction")
 
