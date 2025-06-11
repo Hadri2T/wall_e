@@ -4,8 +4,9 @@ notebooks/
 
 blobs/
 data/
-
+data /
 status/
+data_yolo
 
 # OS generated files #
 ######################
