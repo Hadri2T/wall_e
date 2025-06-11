@@ -14,23 +14,18 @@ import os
 from ultralytics import YOLO
 import cv2
 
-# Paramètres GCP
 BUCKET_NAME = "wall-e-bucket1976"
-REMOTE_MODEL_PATH = "yolo/yolov8n.pt"  # Chemin exact du fichier dans le bucket
-LOCAL_MODEL_PATH = "yolov8n.pt"
+REMOTE_MODEL_PATH = "wall_e_model/yolo/best.pt"
+LOCAL_MODEL_PATH = "best.pt"
 
-# Vérifier si le modèle existe, sinon le télécharger
 if not os.path.exists(LOCAL_MODEL_PATH):
     os.system(f"gcloud storage cp gs://{BUCKET_NAME}/{REMOTE_MODEL_PATH} {LOCAL_MODEL_PATH}")
 
-# Charger le modèle YOLO
 model = YOLO(LOCAL_MODEL_PATH)
 
-# Charger une image locale pour la prédiction
-image_path = "/Users/comelubrano/code/Hadri2T/wall_e/projet/Test_image/download-1.jpg"
+image_path = "/Users/comelubrano/code/Hadri2T/wall_e/projet/Come_yolo/Test_image/1__aluminum-tin-cans-2_jpg.rf.48fb8f75818374b09897ee3a9c20f654.jpg"
 results = model(image_path)
 
-# Visualisation des résultats
 img = results[0].plot()
 cv2.imshow('YOUPI', img)
 key = cv2.waitKey(0)
