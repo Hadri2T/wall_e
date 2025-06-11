@@ -131,7 +131,6 @@ with tabs[1]:
                     idx = int(waste_category_idx)
                     label = YOLO_CLASSES[idx] if idx < len(YOLO_CLASSES) else f"Inconnu ({idx})"
                     st.write(f"Classe : {label} - Confiance : {json['confidence_score'][idc]:.2f}")
-
                     x1, y1, x2, y2 = map(int, json["bounding_boxes"][idc])
                     draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
                     draw.text((x1, y1), label, fill="red")

@@ -37,7 +37,7 @@ def get_training_params(default_epochs=3, default_imgsz=64):
 def train_yolo(data_yaml_path, epochs=3, imgsz=64):
     model = YOLO('yolov8n.pt')
     model.train(
-        data=data_yaml_path,
+        data='/Users/olympedupont/code/Hadri2T/wall_e/projet/ml_logic/data_yolo/data.yaml',
         epochs=epochs,
         imgsz=imgsz,
         save_period=5,
