@@ -8,10 +8,10 @@ import os
 import base64
 import requests
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = st.secrets["API_URL"]
 
 YOLO_CLASSES = [
-    "1", "2", "4", "Beverage Cans", "Bolsa", "Botella", "Bottle", "Bottle cap", "Branch",
+    "1", "2", "plastique", "Beverage Cans", "Bolsa", "Botella", "Bottle", "Bottle cap", "Branch",
     "Bungkus Makanan", "Can", "Fishing wastes", "Glass Bottles", "Glass wastes", "Juice Box",
     "Juice box", "Kantong Plastik", "Metal wastes", "Natural wastes", "Paper", "Plastic",
     "Plastic Bags", "Plastic Bottle", "Plastic Bottles", "Plastic bag", "Plastic bottle",
@@ -113,7 +113,6 @@ with tabs[0]:
     uploaded_file = st.file_uploader("Choisissez une image", type=["jpg", "jpeg", "png"])
     if uploaded_file:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Image chargée", use_column_width=100)
         files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
         url_post = BASE_URL + "/predict"
         response = requests.post(url_post, files=files)
@@ -125,6 +124,7 @@ with tabs[0]:
                 predicted_class = classes[np.argmax(json["prediction"])]
                 confidence = np.max(json["prediction"])
                 st.success(f"Classe prédite : {predicted_class} à {confidence:.2f}%")
+                st.image(image, caption="Image chargée", use_column_width=100)
             elif model == "Yolo":
                 draw = ImageDraw.Draw(image)
                 for idc, waste_category_idx in enumerate(json["waste_categories"]):
@@ -135,7 +135,7 @@ with tabs[0]:
                     x1, y1, x2, y2 = map(int, json["bounding_boxes"][idc])
                     draw.rectangle([x1, y1, x2, y2], outline="red", width=2)
                     draw.text((x1, y1), label, fill="red")
-                st.image(image, caption="Image avec bounding boxes", use_column_width=True)
+                st.image(image, caption="Image avec bounding boxes", use_column_width=100)
         else:
             st.error("Erreur lors de la prédiction")
 

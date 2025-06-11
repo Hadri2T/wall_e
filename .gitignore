@@ -1,6 +1,7 @@
 raw_data/
 .env
 .env.yaml
+secrets.toml
 notebooks/
 
 blobs/
