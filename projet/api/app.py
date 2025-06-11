@@ -33,9 +33,9 @@ st.set_page_config(
 st.title("Pour des eaux claires, wall-e fait la guerre aux déchets en mer.")
 
 # === Menu de navigation personnalisé
-tabs = st.tabs(["Caméra en direct", "Image", "Classes", "À propos"])
+tabs = st.tabs([ "Image", "Caméra en direct", "Classes", "À propos"])
 
-with tabs[0]:
+with tabs[1]:
     st.session_state.active_tab = tabs[0]
     # st.subheader("📷 Détection via webcam")
 
@@ -99,21 +99,21 @@ with tabs[0]:
     )
 
 
-with tabs[1]:
+with tabs[0]:
     st.subheader("Choisir un modèle")
-    model = st.radio('Choisir un modèle', ('CNN', 'Yolo'), 1)
+    model = st.radio('Choisir un modèle', ('CNN', 'Yolo'), 0)
     model_name = "olympe_model" if model == "CNN" else "yolo"
     response = requests.get(BASE_URL + "/model", params={"model_name": model_name})
     if response.status_code == 200:
-        st.success(f"Modèle {model_name} activé")
+        st.success(f"Modèle {model} activé")
     else:
-        st.error("Erreur lors de l’activation du modèle")
+        st.error("Erreur lors du chargement du modèle")
 
     st.subheader("📁 Charger une image")
     uploaded_file = st.file_uploader("Choisissez une image", type=["jpg", "jpeg", "png"])
     if uploaded_file:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Image chargée", use_column_width=True)
+        st.image(image, caption="Image chargée", use_column_width=100)
         files = {"file": (uploaded_file.name, uploaded_file.getvalue())}
         url_post = BASE_URL + "/predict"
         response = requests.post(url_post, files=files)
@@ -124,7 +124,7 @@ with tabs[1]:
                 classes = ["Verre", "Métal", "Plastique"]
                 predicted_class = classes[np.argmax(json["prediction"])]
                 confidence = np.max(json["prediction"])
-                st.success(f"Classe prédite : {predicted_class} avec une confiance de {confidence:.2f}")
+                st.success(f"Classe prédite : {predicted_class} à {confidence:.2f}%")
             elif model == "Yolo":
                 draw = ImageDraw.Draw(image)
                 for idc, waste_category_idx in enumerate(json["waste_categories"]):

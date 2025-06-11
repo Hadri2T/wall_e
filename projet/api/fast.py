@@ -1,18 +1,12 @@
-import pandas as pd
 import numpy as np
 import cv2
-import tensorflow as tf
 
 from projet.ml_logic.data import download_model_from_gcp
-from projet.ml_logic.preprocessor import resize_with_padding
-from fastapi import UploadFile, File, FastAPI, Request
-from PIL import Image
+from fastapi import UploadFile, File, FastAPI
+from PIL import Image, ImageOps
 from io import BytesIO
 
 from fastapi.middleware.cors import CORSMiddleware
-import os
-
-import json
 
 app = FastAPI()
 
@@ -32,8 +26,8 @@ app.state.models = {
 }
 
 # Set default model
-app.state.current_model = "yolo"
-print("Models loaded and default set to YOLO")
+app.state.current_model = "olympe_model"
+print("Models loaded and default set to Olympe")
 
 @app.get("/")
 def root():
@@ -66,8 +60,32 @@ async def predict(file: UploadFile = File(...)):
         }
 
     elif model_name == "olympe_model":
-        img_resized = image.resize((64, 64))
-        img_array = np.array(img_resized) / 255.0
+        # img_resized = image.resize((64, 64))
+
+
+        # Taille actuelle
+        orig_width, orig_height = image.size
+
+        # Ratio de redimensionnement
+        ratio = min(64 / orig_width, 64 / orig_height)
+        new_size = (int(orig_width * ratio), int(orig_height * ratio))
+
+        # Redimensionne l’image sans déformation
+        resized_image = image.resize(new_size, Image.Resampling.LANCZOS)
+
+        # Ajout du padding pour correspondre à la taille cible
+        padded_image = ImageOps.pad(
+            resized_image,
+            (64, 64),
+            method=Image.Resampling.LANCZOS,
+            color=(0, 0, 0),
+            centering=(0.5, 0.5)  # centre l’image dans le canvas
+        )
+
+        # img_array = np.array(img_resized) / 255.0
+
+        img_array = np.array(padded_image) / 255.0
+
         img_array = np.expand_dims(img_array, axis=0)
         prediction = model.predict(img_array)
         return {"prediction": prediction[0].tolist()}

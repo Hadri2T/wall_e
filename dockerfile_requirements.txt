@@ -1,0 +1,12 @@
+
+fastapi==0.108.0
+google-cloud-bigquery
+google-cloud-storage==2.14.0
+google-api-core==2.8.2
+googleapis-common-protos==1.56.4
+numpy==1.23.5
+opencv-python
+pillow
+python-multipart
+ultralytics
+uvicorn
