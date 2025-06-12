@@ -1,9 +1,7 @@
 import requests
 import streamlit as st
-import cv2
 import numpy as np
 from PIL import Image, ImageDraw
-import time
 import os
 import base64
 import requests
