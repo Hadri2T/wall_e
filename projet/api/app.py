@@ -8,19 +8,7 @@ import requests
 
 BASE_URL = st.secrets["API_URL"]
 
-YOLO_CLASSES = [
-    "1", "2", "plastique", "Beverage Cans", "Bolsa", "Botella", "Bottle", "Bottle cap", "Branch",
-    "Bungkus Makanan", "Can", "Fishing wastes", "Glass Bottles", "Glass wastes", "Juice Box",
-    "Juice box", "Kantong Plastik", "Metal wastes", "Natural wastes", "Paper", "Plastic",
-    "Plastic Bags", "Plastic Bottle", "Plastic Bottles", "Plastic bag", "Plastic bottle",
-    "Plastic cup", "Plastic packaging", "Plastic wastes", "Plastic-Bottle", "Plastic-Bottles",
-    "Plastics Container", "Plastics Trash", "Plato", "Red de pesca", "Trash", "Undefined trash",
-    "Vaso", "Waste", "Wood", "Wood wastes", "botellas-de-plastico", "bottle", "bouteille", "can",
-    "cardboard", "dechet", "drink can", "drink carton", "fishing_net", "foam", "glass",
-    "glass-bottle", "metal", "misc", "other", "paper", "pbag", "pbottle", "pet bottle",
-    "petbottle", "plastic", "plastic bottle", "plastic_ silverware", "plastic_bag", "plastic_bags",
-    "plastic_bottle", "plastic_cup", "plastic_mug", "plastic_plates"
-]
+YOLO_CLASSES = ["Verre", "Métal", "Plastique", "Déchet"]
 
 st.set_page_config(
     page_title="Pour des eaux claires, wall-e fait la guerre aux déchets en mer.",
