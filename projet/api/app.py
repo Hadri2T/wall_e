@@ -121,7 +121,7 @@ with tabs[0]:
                 classes = ["Verre", "Métal", "Plastique"]
                 predicted_class = classes[np.argmax(json["prediction"])]
                 confidence = np.max(json["prediction"])
-                st.success(f"Classe prédite : {predicted_class} à {confidence:.2f}%")
+                st.success(f"Classe prédite : {predicted_class} à {confidence:.2f}")
                 st.image(image, caption="Image chargée", use_column_width=100)
             elif model == "Yolo":
                 draw = ImageDraw.Draw(image)
